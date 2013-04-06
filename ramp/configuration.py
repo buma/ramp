@@ -29,8 +29,8 @@ class Configuration(object):
     DEFAULT_PREDICTIONS_NAME = '$predictions'
 
     def __init__(self, target=None, features=None, model=None, metrics=None,
-                 reporters=None, column_subset=None, prediction=None, 
-                 predictions_name=None, actual=None):
+                 reporters=None, column_subset=None, prediction=None,
+                 predictions_name=None, actual=None, feature_names=None):
         """
         Parameters:
         ___________
@@ -70,13 +70,14 @@ class Configuration(object):
             operate on different values.
         """
         self.set_attrs(target, features, metrics, model,
-                       column_subset, prediction, predictions_name, 
-                       actual, reporters)
+                       column_subset, prediction, predictions_name,
+                       actual, reporters, feature_names)
 
     def set_attrs(self, target=None, features=None, metrics=None, model=None,
                   column_subset=None, prediction=None,
-                  predictions_name=None, actual=None, reporters=None):
-            
+                  predictions_name=None, actual=None, reporters=None,
+                  feature_names=None):
+
         if prediction is not None:
             if predictions_name is None:
                 raise ValueError("If you provide a prediction feature, you "
@@ -97,13 +98,19 @@ class Configuration(object):
             actual = self.target
         self.actual = (actual if isinstance(actual, BaseFeature) 
                        else Feature(actual))
-        
-        if features: 
+
+        if features:
+            if isinstance(features, tuple):
+                self.feature_names = features[0]
+                features = features[1]
+            else:
+                self.feature_names = None
             self.features = ([f if isinstance(f, BaseFeature) else Feature(f)
                               for f in features])
         else: 
             self.features = None
-            
+            self.feature_names = None
+
         self.metrics = metrics or []
         self.model = model
         self.column_subset = column_subset
@@ -120,14 +127,17 @@ class Configuration(object):
         return stable_repr(self)
 
     def __str__(self):
-        if self.features is not None: 
-            feature_count = len(self.features)
-        else: 
+        if self.features is not None:
+            if self.feature_names is not None:
+                feature_count = self.feature_names + " " + str(len(self.features))
+            else:
+                feature_count = len(self.features)
+        else:
             feature_count = 0
-        return '%s\n\tmodel: %s\n\t%d features\n\ttarget: %s' % (
+        return '%s\n\tmodel: %s\n\t%s features\n\ttarget: %s' % (
             'Configuration',
             self.model,
-            feature_count, 
+            str(feature_count),
             self.target
         )
 
