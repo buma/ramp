@@ -87,6 +87,13 @@ class LogLoss(Metric):
             predicted))/len(actual)
 
 
+class AccuracyScore(SKLearnMetric):
+    '''Accuracy classification score'''
+    reverse = True
+    metric = staticmethod(metrics.accuracy_score)
+
+
+
 class GeneralizedMCC(Metric):
     """ Matthew's Correlation Coefficient generalized to multi-class case """
     def cov(self, c, n, flip=False):
