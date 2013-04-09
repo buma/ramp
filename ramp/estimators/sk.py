@@ -18,6 +18,10 @@ class Probabilities(object):
     def __str__(self):
         return u"Probabilites for %s" % self.estimator
 
+    #Fixes Bug with same hash for Probability models
+    def __repr__(self):
+        return "<Binary Probabilities <%r>>" % self.estimator
+
     def fit(self, x, y):
         self.estimator.fit(x,y)
 
@@ -31,3 +35,7 @@ class Probabilities(object):
 class BinaryProbabilities(Probabilities):
     def __init__(self, estimator):
         super(BinaryProbabilities, self).__init__(estimator, binary=True)
+
+    #Fixes Bug with same hash for Probability models
+    def __repr__(self):
+        return "<Binary Probabilities <%r>>" % self.estimator
